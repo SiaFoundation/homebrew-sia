@@ -4,6 +4,7 @@ class Renterd < Formula
   url "https://github.com/SiaFoundation/renterd.git", :tag => "v1.0.2"
 
   depends_on "go" => :build
+  depends_on "gcc" => :build
 
   def install
     system "go", "generate", "./..."

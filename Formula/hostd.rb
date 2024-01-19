@@ -4,6 +4,7 @@ class Hostd < Formula
   url "https://github.com/SiaFoundation/hostd.git", :tag => "v1.0.2-beta.1"
 
   depends_on "go" => :build
+  depends_on "gcc" => :build
 
   def install
     system "go", "generate", "./..."
