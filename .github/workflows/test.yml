@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+
+    - name: Set up Homebrew
+      run: |
+        brew update
+        brew tap homebrew/cask
+
+    - name: Test Formulae
+      run: |
+        brew install --build-from-source Formula/*.rb
+        brew test Formula/*.rb
+        brew audit --strict --online Formula/*.rb
+
