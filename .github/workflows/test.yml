@@ -18,11 +18,17 @@ jobs:
       run: |
         brew update
         brew tap homebrew/cask
-        brew remove go@1.20
+        brew uninstall --ignore-dependencies go@1.20 # remove old version of go
 
-    - name: Test Formulae
+    - name: Install and Test Formulae
       run: |
         brew install --build-from-source Formula/*.rb
         brew test Formula/*.rb
-        brew audit --strict --online Formula/*.rb
+
+    - name: Audit Formulae
+      run: |
+        for formula in Formula/*.rb; do
+          formula_name=$(basename $formula .rb)
+          brew audit --strict --online $formula_name
+        done
 
