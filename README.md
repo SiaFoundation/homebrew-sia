@@ -6,6 +6,10 @@
 
 Or `brew tap siafoundation/sia` and then `brew install <formula>`.
 
+### Available Formulae
+
+- [renterd](https://github.com/SiaFoundation/renterd)
+
 ## Documentation
 
 `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).

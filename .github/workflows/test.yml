@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - name: Check out Git repository
+      uses: actions/checkout@v3
+
+    - name: Set up Homebrew
+      run: |
+        brew update
+        brew tap homebrew/cask
+        brew uninstall --ignore-dependencies go@1.20 # remove old version of go
+
+    - name: Install
+      run: brew install --build-from-source Formula/*.rb
+
+    - name: Test
+      run: brew test Formula/*.rb
+
+    - name: Audit
+      run: |
+        for formula in Formula/*.rb; do
+          formula_name=$(basename $formula .rb)
+          brew audit --strict --online $formula_name
+        done
+
