@@ -1,0 +1,47 @@
+name: Update Homebrew Formulas
+
+on:
+  # Run hourly
+  schedule:
+    - cron: '0 * * * *'
+  # Enable manual trigger
+  workflow_dispatch:
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        formula: ["renterd", "hostd"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check for new tag in ${{ matrix.formula }} repository
+        id: check-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Fetch tags with pagination
+          TAGS_JSON=$(gh api --paginate repos/SiaFoundation/${{ matrix.formula }}/tags)
+          
+          # Extract tags, sort them in version order, and pick the highest version
+          LATEST_TAG=$(echo "$TAGS_JSON" | jq -r '.[] | select(.name | startswith("v")).name' | sort -Vr | head -n 1)
+          
+          echo "Latest tag for ${{ matrix.formula }} is $LATEST_TAG"
+          echo "GO_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "VERSION=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Update Homebrew Formula for ${{ matrix.formula }}
+        run: sed -i 's/:tag => "[^"]*"/:tag => "${{  env.GO_TAG }}"/' ./Formula/${{ matrix.formula }}.rb
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5.0.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '${{ matrix.formula }}: ${{ env.GO_TAG }}'
+          title: '${{ matrix.formula }}: ${{ env.GO_TAG }}'
+          body: 'This is an automated PR to update the ${{ matrix.formula }} formula'
+          branch: ${{ matrix.formula }}/update
+          base: master
