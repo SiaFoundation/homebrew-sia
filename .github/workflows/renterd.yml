@@ -42,7 +42,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
         with:
-          token: ${{ secrets.HOMEBREW_CREATE_PR }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'renterd: ${{  env.GO_TAG }}'
           title: 'renterd: ${{  env.GO_TAG }}'
           body: 'This is an automated PR to update the formula of renterd'
