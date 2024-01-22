@@ -31,7 +31,6 @@ jobs:
           
           echo "Latest tag for ${{ matrix.formula }} is $LATEST_TAG"
           echo "GO_TAG=$LATEST_TAG" >> $GITHUB_ENV
-          echo "VERSION=$LATEST_TAG" >> $GITHUB_ENV
 
       - name: Update Homebrew Formula for ${{ matrix.formula }}
         run: sed -i 's/:tag => "[^"]*"/:tag => "${{  env.GO_TAG }}"/' ./Formula/${{ matrix.formula }}.rb
