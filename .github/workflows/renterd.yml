@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Fetch tags with pagination
-          TAGS_JSON=$(gh api --paginate repos/SiaFoundation/web/tags)
+          TAGS_JSON=$(gh api --paginate repos/SiaFoundation/renterd/tags)
           
           # Extract tags that start with "renterd/", sort them in version order, and pick the highest version
           LATEST_RENTERD_GO_TAG=$(echo "$TAGS_JSON" | jq -r '.[] | select(.name | startswith("v")).name' | sort -Vr | head -n 1)
@@ -37,7 +37,7 @@ jobs:
           echo "VERSION=$LATEST_RENTERD_VERSION" >> $GITHUB_ENV
 
       - name: Update Homebrew Formula
-        run: sed -i '' 's/:tag => "[^"]*"/:tag => "${{  env.GO_TAG }}"/' ./Formula/renterd.rb
+        run: sed -i 's/:tag => "[^"]*"/:tag => "${{  env.GO_TAG }}"/' ./Formula/renterd.rb
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
