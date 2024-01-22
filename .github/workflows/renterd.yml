@@ -1,6 +1,11 @@
 name: Update Renterd Formula
 
 on:
+    push:
+        branches:
+            - master
+        tags:
+            - 'vDEBUG'
     # Run hourly
     schedule:
       - cron: '0 * * * *'
