@@ -1,46 +1,45 @@
 name: Update Homebrew Formulas
 
 on:
-  # Run hourly
-  schedule:
-    - cron: '0 * * * *'
-  # Enable manual trigger
+  repository_dispatch:
+    types: [release-tagged]
   workflow_dispatch:
+    inputs:
+        tag:
+            description: 'Version to build'
+            required: true
+            default: 'v1.0.3'
+        project: 
+            description: 'Project to build'
+            required: true
+            default: 'renterd'
 
 jobs:
   update-formula:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        formula: ["renterd", "hostd"]
-
     steps:
+      - name: Store input in env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+            echo "PROJECT=${{ github.event.inputs.project }}" >> $GITHUB_ENV
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV
+            echo "PROJECT=${{ github.event.client_payload.project }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Check for new tag in ${{ matrix.formula }} repository
-        id: check-tag
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Fetch tags with pagination
-          TAGS_JSON=$(gh api --paginate repos/SiaFoundation/${{ matrix.formula }}/tags)
-          
-          # Extract tags, sort them in version order, and pick the highest version
-          LATEST_TAG=$(echo "$TAGS_JSON" | jq -r '.[] | select(.name | startswith("v")).name' | sort -Vr | head -n 1)
-          
-          echo "Latest tag for ${{ matrix.formula }} is $LATEST_TAG"
-          echo "GO_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
-      - name: Update Homebrew Formula for ${{ matrix.formula }}
-        run: sed -i 's/:tag => "[^"]*"/:tag => "${{  env.GO_TAG }}"/' ./Formula/${{ matrix.formula }}.rb
+      - name: Update Homebrew Formula for ${{ env.PROJECT }}
+        run: sed -i 's/:tag => "[^"]*"/:tag => "${{  env.RELEASE_TAG }}"/' ./Formula/${{ env.PROJECT }}.rb
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: '${{ matrix.formula }}: ${{ env.GO_TAG }}'
-          title: '${{ matrix.formula }}: ${{ env.GO_TAG }}'
-          body: 'This is an automated PR to update the ${{ matrix.formula }} formula'
-          branch: ${{ matrix.formula }}/update
+          commit-message: '${{ env.PROJECT }}: ${{ env.RELEASE_TAG }}'
+          title: '${{ env.PROJECT }}: ${{ env.RELEASE_TAG }}'
+          body: 'This is an automated PR to update the ${{ env.PROJECT }} formula'
+          branch: ${{ env.PROJECT }}/update
           base: master
