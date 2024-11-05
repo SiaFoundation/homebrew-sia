@@ -1,18 +1,18 @@
 class Hostd < Formula
-  desc "Hostd: A host for Sia"
+  desc "Hosting daemon for the Sia network"
   homepage "https://github.com/SiaFoundation/hostd"
-  url "https://github.com/SiaFoundation/hostd.git", :tag => "v1.1.2"
+  url "https://github.com/SiaFoundation/hostd.git", tag: "v1.1.2"
 
-  depends_on "go" => :build
   depends_on "gcc" => :build
+  depends_on "go" => :build
 
   def install
     system "go", "generate", "./..."
-    system "go", "build", "-tags='netgo'", "-trimpath", "-o", bin/"hostd", "-a", "-ldflags", "-s -w", "./cmd/hostd"
+    system "go", "build", "-tags='netgo'", "-trimpath", "-o", bin/"hostd",
+           "-a", "-ldflags", "-s -w", "./cmd/hostd"
   end
 
   test do
     system "#{bin}/hostd", "version"
   end
 end
-
