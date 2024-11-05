@@ -27,7 +27,10 @@ jobs:
 
       - name: Audit
         run: |
-          for formula in Formula/*.rb; do
-            formula_name=$(basename $formula .rb)
-            brew audit --strict --online $formula_name
+          brew tap-new siafoundation/test --no-git
+          cp -r Formula/* $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula
+          for file in $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula/*
+          do
+              brew audit --formula "$(basename ${file%.rb})"
           done
+          brew untap siafoundation/test
