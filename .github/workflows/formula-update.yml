@@ -14,6 +14,10 @@ on:
         required: true
         default: "renterd"
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-formula:
     runs-on: ubuntu-latest
@@ -36,9 +40,9 @@ jobs:
           sed -i 's/tag: "[^"]*"/tag: "${{  env.RELEASE_TAG }}"/' ./Formula/${{ env.PROJECT }}.rb
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5.0.2
+        uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          delete-branch: true
           commit-message: "${{ env.PROJECT }}: ${{ env.RELEASE_TAG }}"
           title: "${{ env.PROJECT }}: ${{ env.RELEASE_TAG }}"
           body: "This is an automated PR to update the ${{ env.PROJECT }} formula"
