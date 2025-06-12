@@ -1,7 +1,7 @@
 class Hostd < Formula
   desc "Hosting daemon for the Sia network"
   homepage "https://github.com/SiaFoundation/hostd"
-  url "https://github.com/SiaFoundation/hostd.git", tag: "v2.3.0"
+  url "https://github.com/SiaFoundation/hostd.git", tag: "v2.3.1"
 
   depends_on "gcc" => :build
   depends_on "go" => :build
