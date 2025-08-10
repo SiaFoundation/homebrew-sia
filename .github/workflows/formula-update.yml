@@ -18,6 +18,10 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   update-formula:
     runs-on: ubuntu-latest
@@ -41,6 +45,7 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
+        id: create_pr
         with:
           delete-branch: true
           commit-message: "${{ env.PROJECT }}: ${{ env.RELEASE_TAG }}"
@@ -48,3 +53,7 @@ jobs:
           body: "This is an automated PR to update the ${{ env.PROJECT }} formula"
           branch: ${{ env.PROJECT }}/update
           base: master
+      - name: Automerge
+        run: gh pr merge --merge --auto "${{ steps.result.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
