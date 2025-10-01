@@ -1,7 +1,7 @@
 class Walletd < Formula
   desc "Dedicated Sia wallet"
   homepage "https://github.com/SiaFoundation/walletd"
-  url "https://github.com/SiaFoundation/walletd.git", tag: "v2.10.5"
+  url "https://github.com/SiaFoundation/walletd.git", tag: "v2.11.0"
 
   depends_on "gcc" => :build
   depends_on "go" => :build
