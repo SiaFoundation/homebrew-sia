@@ -20,17 +20,17 @@ jobs:
           brew tap homebrew/cask
 
       - name: Install
-        run: brew install --formula --build-from-source Formula/*.rb
-
-      - name: Test
-        run: brew test Formula/*.rb
-
-      - name: Audit
         run: |
           brew tap-new siafoundation/test --no-git
           cp -r Formula/* $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula
+          brew install --formula --build-from-source $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula/*.rb
+
+      - name: Test
+        run: brew test $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula/*.rb
+
+      - name: Audit
+        run: |
           for file in $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula/*
           do
               brew audit --formula "$(basename ${file%.rb})"
           done
-          brew untap siafoundation/test
