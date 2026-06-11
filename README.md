@@ -11,6 +11,7 @@ Or `brew tap siafoundation/sia` and then `brew install <formula>`.
 - [renterd](https://github.com/SiaFoundation/renterd)
 - [hostd](https://github.com/SiaFoundation/hostd)
 - [walletd](https://github.com/SiaFoundation/walletd)
+- [s3d](https://github.com/SiaFoundation/s3d)
 
 ## Documentation
 
