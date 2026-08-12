@@ -23,6 +23,7 @@ jobs:
         run: |
           brew tap-new siafoundation/test --no-git
           cp -r Formula/* $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula
+          brew trust siafoundation/test
           brew install --formula --build-from-source $(brew --repository)/Library/Taps/siafoundation/homebrew-test/Formula/*.rb
 
       - name: Test
