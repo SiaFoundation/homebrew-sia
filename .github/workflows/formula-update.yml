@@ -41,7 +41,20 @@ jobs:
 
       - name: Update Homebrew Formula for ${{ env.PROJECT }}
         run: |
-          sed -i 's/tag: "[^"]*"/tag: "${{  env.RELEASE_TAG }}"/' ./Formula/${{ env.PROJECT }}.rb
+          # brew audit requires `revision:` to pin the tag to a full commit hash.
+          # annotated tags advertise a peeled "^{}" entry pointing at the commit;
+          # lightweight tags only advertise the plain entry.
+          REVISION=$(git ls-remote --tags "https://github.com/SiaFoundation/${PROJECT}.git" \
+            "refs/tags/${RELEASE_TAG}" "refs/tags/${RELEASE_TAG}^{}" \
+            | awk '/\^\{\}$/ { peeled = $1 } !/\^\{\}$/ { plain = $1 } END { print (peeled != "" ? peeled : plain) }')
+          if ! [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::could not resolve tag ${RELEASE_TAG} in SiaFoundation/${PROJECT} to a commit"
+            exit 1
+          fi
+          sed -i \
+            -e "s/tag: *\"[^\"]*\"/tag:      \"${RELEASE_TAG}\"/" \
+            -e "s/revision: *\"[^\"]*\"/revision: \"${REVISION}\"/" \
+            "./Formula/${PROJECT}.rb"
 
       - name: Mint bot token
         id: bot-token
@@ -63,8 +76,8 @@ jobs:
           body: "This is an automated PR to update the ${{ env.PROJECT }} formula"
           branch: ${{ env.PROJECT }}/update
           base: master
-      - name: Automerge
+      - name: Merge Pull Request
         if: steps.create_pr.outputs.pull-request-number != ''
-        run: gh pr merge --merge --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+        run: gh pr merge --merge --delete-branch "${{ steps.create_pr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ steps.bot-token.outputs.token }}

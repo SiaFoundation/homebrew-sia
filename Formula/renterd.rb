@@ -1,7 +1,9 @@
 class Renterd < Formula
   desc "Renting application for the Sia network"
   homepage "https://github.com/SiaFoundation/renterd"
-  url "https://github.com/SiaFoundation/renterd.git", tag: "v2.9.5"
+  url "https://github.com/SiaFoundation/renterd.git",
+      tag:      "v2.9.5",
+      revision: "88fa4aefe617a7ff784f8fa0e05bf4041b9c50b5"
 
   depends_on "gcc" => :build
   depends_on "go" => :build
